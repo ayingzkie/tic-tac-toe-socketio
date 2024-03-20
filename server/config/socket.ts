@@ -1,10 +1,11 @@
 import { Server } from "socket.io";
-import { SocketControllers } from "socket-controllers";
+import { useSocketServer } from "socket-controllers";
 import Container from "typedi";
 import { Server as HttpServer } from "http";
+import { dirname } from "path";
 import { MainController } from "../controllers/MainController";
 import { RoomController } from "../controllers/RoomController";
-import { GameController } from "../controllers/GameController";
+import { GameController } from "../controllers/gameController";
 
 export default (server: HttpServer) => {
   const io = new Server(server, {
@@ -13,15 +14,9 @@ export default (server: HttpServer) => {
     },
   });
 
-  try {
-    new SocketControllers({
-      io,
-      container: Container,
-      controllers: [MainController, RoomController, GameController],
-    });
-  } catch (e) {
-    console.log(e);
-  }
+  useSocketServer(io, {
+    controllers: [MainController, RoomController, GameController],
+  });
 
   return io;
 };

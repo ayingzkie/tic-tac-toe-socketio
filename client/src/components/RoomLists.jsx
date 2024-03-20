@@ -7,36 +7,40 @@ import gameContext from "../context/gameContext";
 
 const RoomLists = () => {
   const { roomLists, setRoomLists, setIsInRoom } = useContext(gameContext);
+  const [isLoading, setIsLoading] = useState(false);
 
-  async function fetchRooms() {
+  const fetchRooms = async () => {
     const { data } = await getRoomLists();
     console.log(data);
     setRoomLists(data?.rooms || []);
-  }
+  };
 
-  function initSocketService() {
+  const initSocketService = () => {
     const socket = socketService.socket;
     if (socket) {
       gameService.onUpdateLists(socket, () => {
         fetchRooms();
       });
     }
-  }
+  };
 
-  function joinGame(roomId) {
+  const joinGame = async (roomId) => {
     const socket = socketService.socket;
+    if (!roomId || roomId === "" || !socket) return;
+    setIsLoading(true);
+    const joined = await gameService
+      .joinGame(socket, roomId)
+      .catch((error) => console.log(error));
 
-    if (socket) {
-      gameService.joinGame(socket, roomId).then(() => {
-        setIsInRoom(true);
-      });
-    }
-  }
+    if (joined) setIsInRoom(true);
 
-  function formatRoomName(name) {
+    setIsLoading(false);
+  };
+
+  const formatRoomName = (name) => {
     const newName = String(name).split("-");
     return [newName[1]];
-  }
+  };
 
   useEffect(() => {
     fetchRooms();
@@ -52,7 +56,7 @@ const RoomLists = () => {
         click
       </button>
       <h2>Room lists</h2>
-      <table>
+      <table border={1} cellSpacing={0}>
         <thead>
           <tr>
             <td>RoomID</td>
@@ -61,14 +65,17 @@ const RoomLists = () => {
           </tr>
         </thead>
         <tbody>
-          {roomLists.map((list) => {
+          {roomLists.map((list, idx) => {
             return (
-              <tr>
+              <tr key={`${list.name}-${idx}`}>
                 <td>{formatRoomName(list.name)}</td>
                 <td>{list.count}</td>
                 <td>
                   {list.count < 2 ? (
-                    <button onClick={() => joinGame(formatRoomName(list.name))}>
+                    <button
+                      disabled={isLoading}
+                      onClick={() => joinGame(formatRoomName(list.name))}
+                    >
                       Join
                     </button>
                   ) : (

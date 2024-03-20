@@ -5,13 +5,18 @@ import GameContext from "./context/gameContext";
 import Form from "./components/Form";
 import Game from "./components/Game";
 import RoomLists from "./components/RoomLists";
+import History from "./components/History";
+import Board from "./components/Board";
 
 function App() {
   const [playerSymbol, setPlayerSymbol] = useState("x");
   const [isInRoom, setIsInRoom] = useState(false);
   const [roomLists, setRoomLists] = useState([]);
+  const [isPlayerTurn, setIsPlayerTurn] = useState(false);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+
   async function connectSocket() {
-    const socket = await socketService.connect("http://192.168.68.100:3000");
+    const socket = await socketService.connect();
   }
 
   useEffect(() => {
@@ -27,6 +32,10 @@ function App() {
         setPlayerSymbol,
         roomLists,
         setRoomLists,
+        isPlayerTurn,
+        setIsPlayerTurn,
+        isGameStarted,
+        setIsGameStarted,
       }}
     >
       <div className="container">
@@ -40,7 +49,7 @@ function App() {
           </Fragment>
         )}
       </div>
-      {isInRoom && <Game />}
+      {isInRoom && <Board />}
     </GameContext.Provider>
   );
 }

@@ -1,4 +1,3 @@
-import { Socket } from "engine.io";
 import {
   ConnectedSocket,
   MessageBody,
@@ -6,13 +5,13 @@ import {
   OnMessage,
   SocketController,
 } from "socket-controllers";
+import { Socket } from "socket.io";
 import { Service } from "typedi";
 
 @SocketController()
-@Service()
 export class MainController {
   @OnConnect()
-  connection(@ConnectedSocket() socket: Socket) {
-    console.log("connected!");
+  public async connection(@ConnectedSocket() socket: Socket) {
+    console.log("connected!" + socket.id);
   }
 }

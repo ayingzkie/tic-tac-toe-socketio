@@ -7,6 +7,10 @@ const defaultValue = {
   setPlayerSymbol: () => {},
   roomLists: [],
   setRoomLists: () => {},
+  isPlayerTurn: false,
+  setIsPlayerTurn: () => {},
+  isGameStarted: false,
+  setIsGameStarted: () => {},
 };
 
 export default React.createContext(defaultValue);

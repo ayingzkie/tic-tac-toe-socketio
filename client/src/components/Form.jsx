@@ -7,6 +7,7 @@ import RoomLists from "./RoomLists";
 
 const Form = () => {
   const [roomId, setRoomId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { setIsInRoom } = useContext(gameContext);
 
   const handleInputChange = (e) => {
@@ -18,16 +19,15 @@ const Form = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const socket = socketService.socket;
+    if (!roomId || roomId === "" || !socket) return;
+    setIsLoading(true);
+    const joined = await gameService
+      .joinGame(socket, roomId)
+      .catch((error) => console.log(error));
 
-    if (socket) {
-      gameService
-        .joinGame(socket, roomId)
-        .then(() => {
-          alert("Success");
-          setIsInRoom(true);
-        })
-        .catch((error) => alert(error));
-    }
+    if (joined) setIsInRoom(true);
+
+    setIsLoading(false);
   };
 
   return (
@@ -38,7 +38,14 @@ const Form = () => {
           onChange={handleInputChange}
           placeholder="Room ID"
         />
-        <button type="submit">Start new game</button>
+        <input
+          value={roomId}
+          onChange={handleInputChange}
+          placeholder="Room ID"
+        />
+        <button type="submit" disabled={isLoading}>
+          Start new game
+        </button>
       </form>
     </Container>
   );

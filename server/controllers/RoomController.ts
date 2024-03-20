@@ -5,22 +5,21 @@ import {
   SocketController,
   SocketIO,
 } from "socket-controllers";
-import { Service } from "typedi";
-import socket from "../config/socket";
 import { Server, Socket } from "socket.io";
 
 @SocketController()
-@Service()
 export class RoomController {
-  @OnMessage("join")
-  join(
-    @ConnectedSocket() socket: Socket,
+  @OnMessage("join_game")
+  public async joinGame(
     @SocketIO() io: Server,
+    @ConnectedSocket() socket: Socket,
     @MessageBody() message: any
   ) {
-    console.log("New user is joining", message);
+    console.log("New User joining room: ", message);
 
-    const connectedSockets = io.sockets.adapter.rooms.get(message.roomId);
+    const newRoomName = `created-${message.roomId}`;
+
+    const connectedSockets = io.sockets.adapter.rooms.get(newRoomName);
     const socketRooms = Array.from(socket.rooms.values()).filter(
       (r) => r !== socket.id
     );
@@ -29,12 +28,19 @@ export class RoomController {
       socketRooms.length > 0 ||
       (connectedSockets && connectedSockets.size === 2)
     ) {
-      socket.emit("join_error", {
-        error: "Error in joining room",
+      socket.emit("room_join_error", {
+        error: "Room is full please choose another room to play!",
       });
     } else {
-      socket.emit("join_success");
-      socket.join(`created-${message.roomId}`);
+      await socket.join(newRoomName);
+      socket.emit("room_joined");
+
+      if (io.sockets.adapter.rooms.get(newRoomName)?.size === 2) {
+        socket.emit("start_game", { start: true, player: "x" });
+        socket
+          .to(newRoomName)
+          .emit("start_game", { start: false, player: "o" });
+      }
     }
   }
 
