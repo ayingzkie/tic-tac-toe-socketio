@@ -3,7 +3,14 @@ import GameResultModel from "../../models/GameResult.model";
 
 export default async (req: Request, res: Response) => {
   try {
-    const result = await GameResultModel.find({});
+    const result = await GameResultModel.aggregate([
+      {
+        $group: {
+          _id: "$roomId",
+          participants: { $push: "$$ROOT" },
+        },
+      },
+    ]);
 
     return res.status(200).json(result);
   } catch (e) {

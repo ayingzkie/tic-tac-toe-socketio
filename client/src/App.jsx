@@ -1,9 +1,8 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import socketService from "./services/socketService";
 import GameContext from "./context/gameContext";
 import Form from "./components/Form";
-import Game from "./components/Game";
 import RoomLists from "./components/RoomLists";
 import History from "./components/History";
 import Board from "./components/Board";
@@ -45,17 +44,11 @@ function App() {
       }}
     >
       <div className="container">
-        {!isInRoom && (
-          <Fragment>
-            <aside className="side-content">
-              <RoomLists />
-              <History />
-            </aside>
-            <Form />
-          </Fragment>
-        )}
+        {!isInRoom && <History />}
+        {!isInRoom && <Form />}
+        {isInRoom && <Board />}
+        {!isInRoom && <RoomLists />}
       </div>
-      {isInRoom && <Board />}
     </GameContext.Provider>
   );
 }

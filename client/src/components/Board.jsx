@@ -92,6 +92,11 @@ const Board = () => {
     const newMatrix = [...matrix];
     const socket = socketService.socket;
 
+    if (!playerName) {
+      alert("Please enter you name");
+      return;
+    }
+
     if (newMatrix[row][col] === null || newMatrix[row][col] === "null") {
       newMatrix[row][col] = symbol;
       setMatrix(newMatrix);
@@ -106,6 +111,7 @@ const Board = () => {
       if (currentIsWinner && otherIsWinner) {
         gameService.gameWin(socket, { message: "It's a tie!", isDraw: true });
         setMessage("It's a tie!");
+        setDrawCount((prev) => prev + 1);
       } else if (currentIsWinner && !otherIsWinner) {
         gameService.gameWin(socket, { message: "You lose!", isLose: true });
         setMessage("You won!");
@@ -205,6 +211,7 @@ const Board = () => {
   };
   const handleStop = () => {
     setIsInRoom(false);
+    setRoomId("");
     const socket = socketService.socket;
 
     if (socket) {
@@ -316,6 +323,7 @@ const Container = styled.div`
 
 const Row = styled.div`
   display: flex;
+  gap: 8px;
 `;
 
 const Cell = styled.div`

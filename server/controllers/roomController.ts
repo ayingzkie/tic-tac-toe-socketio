@@ -67,8 +67,6 @@ export class RoomController {
     await socket.leave(room);
     socket.to(room).emit("on_leave_game");
 
-    console.log(body, "@save result");
-
     const afterSave = await GameResultModel.create({
       roomId,
       playerName,

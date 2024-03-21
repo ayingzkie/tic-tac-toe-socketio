@@ -1,7 +1,34 @@
 .container {
   display: flex;
+  padding: 20px;
+
+  @media screen and (max-width: 720px) {
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
 }
 
-.side-content {
+.container > div > table {
+  width: 100%;
+}
+
+.container > div:not(:only-child) {
+  flex: 1;
+}
+
+.container > div:not(:only-child):not(:nth-of-type(2)) {
   width: 20%;
+}
+
+button {
+  padding: 20px;
+  font-size: 20px;
+  font-weight: bold;
+
+  outline: none;
+  border: none;
+
+  color: gray;
 }
