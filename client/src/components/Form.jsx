@@ -5,18 +5,12 @@ import gameService from "../services/gameService";
 import gameContext from "../context/gameContext";
 
 const Form = () => {
-  const [roomId, setRoomId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { setIsInRoom, playerName, setPlayerName } = useContext(gameContext);
+  const { setIsInRoom, roomId, setRoomId } = useContext(gameContext);
   const handleInputChange = (e) => {
     const value = e.target.value;
 
     setRoomId(value);
-  };
-
-  const handleInputPlayer = (e) => {
-    const value = e.target.value;
-    setPlayerName(value);
   };
 
   const handleSubmit = async (e) => {
@@ -36,11 +30,6 @@ const Form = () => {
   return (
     <Container>
       <form onSubmit={handleSubmit}>
-        <input
-          value={playerName}
-          onChange={handleInputPlayer}
-          placeholder="Player name"
-        />
         <input
           value={roomId}
           onChange={handleInputChange}

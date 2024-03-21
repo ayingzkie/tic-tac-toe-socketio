@@ -32,8 +32,8 @@ export default {
   onGameWin(socket, callback) {
     socket.on("game_win", ({ message }) => callback(message));
   },
-  continueGame(socket, count) {
-    socket.emit("continue_game", { count });
+  continueGame(socket, payload) {
+    socket.emit("continue_game", { payload });
   },
   onContinue(socket, callback) {
     socket.on("on_continue_game", ({ count }) => callback(count));

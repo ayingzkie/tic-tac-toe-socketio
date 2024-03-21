@@ -3,7 +3,7 @@ import styled from "styled-components";
 import gameContext from "../context/gameContext";
 import gameService from "../services/gameService";
 import socketService from "../services/socketService";
-import roomService from "../services/roomService";
+import axiosInstance from "../utils/axios";
 
 const Board = () => {
   const defualtMatrix = [
@@ -17,6 +17,8 @@ const Board = () => {
   const [message, setMessage] = useState("");
   const [votes, setVotes] = useState(0);
   const [isVoted, setIsVoted] = useState(false);
+  const [playerName, setPlayerName] = useState("");
+  const [result, setResult] = useState({});
 
   const {
     playerSymbol,
@@ -26,6 +28,8 @@ const Board = () => {
     isPlayerTurn,
     setIsPlayerTurn,
     setIsInRoom,
+    roomId,
+    setRoomId,
   } = useContext(gameContext);
 
   const resetGame = () => {
@@ -150,6 +154,7 @@ const Board = () => {
         setMatrix(defualtMatrix);
         setIsGameStarted(true);
         setPlayerSymbol(options.player);
+        setRoomId(options.roomId);
         if (options.start) setIsPlayerTurn(true);
         else setIsPlayerTurn(false);
       });
@@ -214,6 +219,18 @@ const Board = () => {
     }
   };
 
+  const hanldePlayerNameChange = (e) => {
+    setPlayerName(e.target.value);
+  };
+
+  const saveCurrentResult = (roomId, winner, loser) => {
+    axiosInstance.post("/save", {
+      roomId,
+      winner,
+      loser,
+    });
+  };
+
   useEffect(() => {
     handleStartGame();
     handleUpdateMove();
@@ -230,7 +247,14 @@ const Board = () => {
 
   return (
     <Container>
-      <h3>Your playing as {String(playerSymbol).toUpperCase()}</h3>
+      <h1>Room ID: {roomId}</h1>
+      <form>
+        Enter your name:{" "}
+        <input value={playerName} onCanPlay={hanldePlayerNameChange} />
+      </form>
+      {isGameStarted && (
+        <h3>Your playing as {String(playerSymbol).toUpperCase()}</h3>
+      )}
       {!isGameStarted && <h2>Waiting for other player....</h2>}
       {(!isGameStarted || !isPlayerTurn) && (
         <Overlay>

@@ -6,7 +6,6 @@ import {
   SocketIO,
 } from "socket-controllers";
 import { Server, Socket } from "socket.io";
-import socket from "../config/socket";
 
 @SocketController()
 export class RoomController {
@@ -46,10 +45,16 @@ export class RoomController {
       socket.emit("room_joined");
 
       if (io.sockets.adapter.rooms.get(newRoomName)?.size === 2) {
-        socket.emit("start_game", { start: true, player: "x" });
-        socket
-          .to(newRoomName)
-          .emit("start_game", { start: false, player: "o" });
+        socket.emit("start_game", {
+          start: true,
+          player: "x",
+          roomId: newRoomName,
+        });
+        socket.to(newRoomName).emit("start_game", {
+          start: false,
+          player: "o",
+          roomId: newRoomName,
+        });
       }
     }
   }

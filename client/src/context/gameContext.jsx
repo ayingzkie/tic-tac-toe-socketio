@@ -13,6 +13,8 @@ const defaultValue = {
   setIsGameStarted: () => {},
   playerName: "",
   setPlayerName: () => {},
+  roomId: "",
+  setRoomId: () => {},
 };
 
 export default React.createContext(defaultValue);

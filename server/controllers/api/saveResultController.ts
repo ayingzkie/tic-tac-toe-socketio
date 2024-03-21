@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
-import database from "../../config/database";
+import GameResultModel from "../../models/GameResult.model";
 
 export default async (req: Request, res: Response) => {
-  const gameResults = await database();
+  await GameResultModel.create({
+    roomId: 123,
+    winner: "John",
+    loser: "Nikko",
+  });
   return res.send("Hello");
 };

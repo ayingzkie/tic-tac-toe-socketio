@@ -4,8 +4,28 @@ import socket from "./config/socket";
 import { createServer } from "http";
 import cors from "cors";
 import router from "./routes";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
+
+//Mongoose setup start
+
+const mongoDB = process.env.DB_URI || "";
+console.log(mongoDB, "@db");
+
+mongoose.set("strictQuery", false);
+
+main().catch((err) => console.log(err));
+
+async function main() {
+  await mongoose.connect(mongoDB);
+}
+
+// Mongoose end;
+
 const server = createServer(app);
 
 const io = socket(server);
