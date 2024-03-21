@@ -17,19 +17,31 @@ export default {
       matrix,
     });
   },
-  async onUpdateBoardDone(socket, callback) {
+  onUpdateBoardDone(socket, callback) {
     socket.on("update_board_done", ({ matrix }) => callback(matrix));
   },
-  async onUpdateLists(socket, callback) {
+  onUpdateLists(socket, callback) {
     socket.on("on_update_lists", callback);
   },
-  async onGameStart(socket, callback) {
+  onGameStart(socket, callback) {
     socket.on("start_game", callback);
   },
-  async gameWin(socket, message) {
+  gameWin(socket, message) {
     socket.emit("game_win", { message });
   },
-  async onGameWin(socket, callback) {
+  onGameWin(socket, callback) {
     socket.on("game_win", ({ message }) => callback(message));
+  },
+  continueGame(socket, count) {
+    socket.emit("continue_game", { count });
+  },
+  onContinue(socket, callback) {
+    socket.on("on_continue_game", ({ count }) => callback(count));
+  },
+  leaveGame(socket) {
+    socket.emit("leave_game");
+  },
+  onLeaveGame(socket, callback) {
+    socket.on("on_leave_game", callback);
   },
 };

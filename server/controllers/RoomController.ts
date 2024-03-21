@@ -6,9 +6,19 @@ import {
   SocketIO,
 } from "socket-controllers";
 import { Server, Socket } from "socket.io";
+import socket from "../config/socket";
 
 @SocketController()
 export class RoomController {
+  private getRoom(socket: Socket) {
+    const socketRooms = Array.from(socket.rooms.values()).filter(
+      (r) => r !== socket.id
+    );
+    const gameRoom = socketRooms && socketRooms[0];
+
+    return gameRoom;
+  }
+
   @OnMessage("join_game")
   public async joinGame(
     @SocketIO() io: Server,
@@ -44,6 +54,15 @@ export class RoomController {
     }
   }
 
+  @OnMessage("leave_game")
+  async eaveGame(@ConnectedSocket() socket: Socket) {
+    const room = this.getRoom(socket);
+    await socket.leave(room);
+    console.log(room, "@roomName");
+    console.log("leaving game");
+    socket.to(room).emit("on_leave_game");
+  }
+
   @OnMessage("on_update_lists")
   onUpdateRoomLists(
     @ConnectedSocket() socket: Socket,
@@ -51,5 +70,16 @@ export class RoomController {
   ) {
     console.log(message, "@message");
     socket.broadcast.emit("on_update_lists");
+  }
+
+  @OnMessage("continue_game")
+  continueGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
+    const room = this.getRoom(socket);
+
+    if (message.count === 2) {
+      socket.emit("on_continue_game", { count: message.count });
+    }
+
+    socket.to(room).emit("on_continue_game", { count: message.count });
   }
 }

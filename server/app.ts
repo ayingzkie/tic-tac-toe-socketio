@@ -3,6 +3,7 @@ import express from "express";
 import socket from "./config/socket";
 import { createServer } from "http";
 import cors from "cors";
+import router from "./routes";
 
 const app = express();
 const server = createServer(app);
@@ -14,6 +15,8 @@ app.use(
     origin: "*",
   })
 );
+
+app.use(router);
 
 app.get("/", (req, res) => {
   res.send("App is running!");

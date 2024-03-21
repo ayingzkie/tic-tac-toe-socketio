@@ -14,6 +14,7 @@ function App() {
   const [roomLists, setRoomLists] = useState([]);
   const [isPlayerTurn, setIsPlayerTurn] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const [playerName, setPlayerName] = useState("");
 
   async function connectSocket() {
     const socket = await socketService.connect();
@@ -36,6 +37,8 @@ function App() {
         setIsPlayerTurn,
         isGameStarted,
         setIsGameStarted,
+        playerName,
+        setPlayerName,
       }}
     >
       <div className="container">

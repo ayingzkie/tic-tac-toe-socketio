@@ -11,6 +11,8 @@ const defaultValue = {
   setIsPlayerTurn: () => {},
   isGameStarted: false,
   setIsGameStarted: () => {},
+  playerName: "",
+  setPlayerName: () => {},
 };
 
 export default React.createContext(defaultValue);

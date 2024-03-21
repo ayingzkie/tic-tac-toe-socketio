@@ -3,15 +3,20 @@ import styled from "styled-components";
 import gameContext from "../context/gameContext";
 import gameService from "../services/gameService";
 import socketService from "../services/socketService";
+import roomService from "../services/roomService";
 
 const Board = () => {
-  const [matrix, setMatrix] = useState([
+  const defualtMatrix = [
     [null, null, null],
     [null, null, null],
     [null, null, null],
-  ]);
+  ];
+
+  const [matrix, setMatrix] = useState(defualtMatrix);
 
   const [message, setMessage] = useState("");
+  const [votes, setVotes] = useState(0);
+  const [isVoted, setIsVoted] = useState(false);
 
   const {
     playerSymbol,
@@ -22,6 +27,13 @@ const Board = () => {
     setIsPlayerTurn,
     setIsInRoom,
   } = useContext(gameContext);
+
+  const resetGame = () => {
+    setMessage("");
+    setMatrix(defualtMatrix);
+    setIsVoted(false);
+    setVotes(0);
+  };
 
   const checkGameState = (matrix) => {
     for (let i = 0; i < matrix.length; i++) {
@@ -77,10 +89,11 @@ const Board = () => {
     if (newMatrix[row][col] === null || newMatrix[row][col] === "null") {
       newMatrix[row][col] = symbol;
       setMatrix(newMatrix);
+    } else {
+      return;
     }
 
     if (socket) {
-      setIsPlayerTurn(false);
       gameService.updateBoard(socket, { matrix: newMatrix });
       const [currentIsWinner, otherIsWinner] = checkGameState(matrix);
 
@@ -92,6 +105,8 @@ const Board = () => {
         setMessage("You won!");
       }
     }
+
+    setIsPlayerTurn(false);
   };
 
   const renderBoard = () => {
@@ -129,6 +144,10 @@ const Board = () => {
     const socket = socketService.socket;
     if (socket) {
       gameService.onGameStart(socket, (options) => {
+        if (!message) {
+          setMessage("");
+        }
+        setMatrix(defualtMatrix);
         setIsGameStarted(true);
         setPlayerSymbol(options.player);
         if (options.start) setIsPlayerTurn(true);
@@ -147,25 +166,81 @@ const Board = () => {
     }
   };
 
+  const handleContinue = () => {
+    const socket = socketService.socket;
+    const newCount = votes + 1;
+
+    setVotes((prev) => prev + 1);
+    setIsVoted(true);
+
+    if (socket) {
+      gameService.continueGame(socket);
+    }
+
+    if (newCount === 2) {
+      setIsPlayerTurn(true);
+    }
+  };
+
   const handleOnContinue = () => {
+    const socket = socketService.socket;
+
+    if (socket) {
+      gameService.onContinue(socket, (count) => {
+        setVotes((prev) => prev + 1);
+
+        setMessage("Other player wants to play another round");
+      });
+    }
+  };
+  const handleStop = () => {
     setIsInRoom(false);
+    const socket = socketService.socket;
+
+    if (socket) {
+      gameService.leaveGame(socket);
+    }
+  };
+
+  const handleOnLeaveGame = () => {
+    const socket = socketService.socket;
+
+    if (socket) {
+      gameService.onLeaveGame(socket, () => {
+        setMessage(
+          "Pleayer is the leaveing the game. \n Waiting for player to join."
+        );
+      });
+    }
   };
 
   useEffect(() => {
     handleStartGame();
     handleUpdateMove();
     handleGameWinner();
+    handleOnLeaveGame();
+    handleOnContinue();
   }, []);
+
+  useEffect(() => {
+    if (votes === 2) {
+      resetGame();
+    }
+  }, [votes]);
 
   return (
     <Container>
+      <h3>Your playing as {String(playerSymbol).toUpperCase()}</h3>
       {!isGameStarted && <h2>Waiting for other player....</h2>}
       {(!isGameStarted || !isPlayerTurn) && (
         <Overlay>
           {message && (
             <Fragment>
               <h3>{message}</h3>
-              <button onClick={handleOnContinue}>Continue</button>
+              <button disabled={isVoted} onClick={handleContinue}>
+                Continue
+              </button>
+              <button onClick={handleStop}>Stop</button>
             </Fragment>
           )}
         </Overlay>
