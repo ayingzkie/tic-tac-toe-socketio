@@ -5,3 +5,9 @@ export function getRoomLists() {
 
   return result;
 }
+
+export function getResults() {
+  const records = axiosInstance.get("/get-results");
+
+  return records;
+}

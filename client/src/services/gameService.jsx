@@ -38,8 +38,8 @@ export default {
   onContinue(socket, callback) {
     socket.on("on_continue_game", ({ count }) => callback(count));
   },
-  leaveGame(socket) {
-    socket.emit("leave_game");
+  leaveGame(socket, payload) {
+    socket.emit("leave_game", payload);
   },
   onLeaveGame(socket, callback) {
     socket.on("on_leave_game", callback);

@@ -32,10 +32,9 @@ export class GameController {
     @ConnectedSocket() socket: Socket,
     @MessageBody() body: any
   ) {
-    const { message } = body;
+    const { message, isDraw, isLose } = body;
     const gameRoom = this.getRoom(socket);
-    console.log(body, "@body");
 
-    socket.to(gameRoom).emit("game_win", { message });
+    socket.to(gameRoom).emit("game_win", { message, isDraw, isLose });
   }
 }

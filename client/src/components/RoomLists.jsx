@@ -4,6 +4,7 @@ import { getRoomLists } from "../utils/api";
 import socketService from "../services/socketService";
 import gameService from "../services/gameService";
 import gameContext from "../context/gameContext";
+import Table from "./styled/Table";
 
 const RoomLists = () => {
   const { roomLists, setRoomLists, setIsInRoom } = useContext(gameContext);
@@ -56,7 +57,7 @@ const RoomLists = () => {
         click
       </button>
       <h2>Room lists</h2>
-      <table border={1} cellSpacing={0}>
+      <Table border={1} cellSpacing={0}>
         <thead>
           <tr>
             <td>RoomID</td>
@@ -86,7 +87,7 @@ const RoomLists = () => {
             );
           })}
         </tbody>
-      </table>
+      </Table>
     </Container>
   );
 };

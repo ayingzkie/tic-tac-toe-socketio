@@ -18,7 +18,9 @@ const Board = () => {
   const [votes, setVotes] = useState(0);
   const [isVoted, setIsVoted] = useState(false);
   const [playerName, setPlayerName] = useState("");
-  const [result, setResult] = useState({});
+  const [winCount, setWinCount] = useState(0);
+  const [loseCount, setLoseCount] = useState(0);
+  const [drawCount, setDrawCount] = useState(0);
 
   const {
     playerSymbol,
@@ -102,11 +104,12 @@ const Board = () => {
       const [currentIsWinner, otherIsWinner] = checkGameState(matrix);
 
       if (currentIsWinner && otherIsWinner) {
-        gameService.gameWin(socket, { message: "It's a tie!" });
+        gameService.gameWin(socket, { message: "It's a tie!", isDraw: true });
         setMessage("It's a tie!");
       } else if (currentIsWinner && !otherIsWinner) {
-        gameService.gameWin(socket, { message: "You lose!" });
+        gameService.gameWin(socket, { message: "You lose!", isLose: true });
         setMessage("You won!");
+        setWinCount((prev) => prev + 1);
       }
     }
 
@@ -164,9 +167,11 @@ const Board = () => {
   const handleGameWinner = () => {
     const socket = socketService.socket;
     if (socket) {
-      gameService.onGameWin(socket, ({ message }) => {
+      gameService.onGameWin(socket, ({ message, isLose, isDraw }) => {
         setMessage(message);
         setIsPlayerTurn(false);
+        if (isLose) setLoseCount((prev) => prev + 1);
+        if (isDraw) setDrawCount((prev) => prev + 1);
       });
     }
   };
@@ -203,7 +208,13 @@ const Board = () => {
     const socket = socketService.socket;
 
     if (socket) {
-      gameService.leaveGame(socket);
+      gameService.leaveGame(socket, {
+        roomId,
+        playerName,
+        winCount,
+        loseCount,
+        drawCount,
+      });
     }
   };
 
@@ -250,8 +261,11 @@ const Board = () => {
       <h1>Room ID: {roomId}</h1>
       <form>
         Enter your name:{" "}
-        <input value={playerName} onCanPlay={hanldePlayerNameChange} />
+        <input value={playerName} onChange={hanldePlayerNameChange} />
       </form>
+      <h3>
+        Stats: Draw={drawCount} | Lose={loseCount} | Win={winCount}
+      </h3>
       {isGameStarted && (
         <h3>Your playing as {String(playerSymbol).toUpperCase()}</h3>
       )}

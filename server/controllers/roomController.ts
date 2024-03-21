@@ -6,6 +6,7 @@ import {
   SocketIO,
 } from "socket-controllers";
 import { Server, Socket } from "socket.io";
+import GameResultModel from "../models/GameResult.model";
 
 @SocketController()
 export class RoomController {
@@ -60,12 +61,23 @@ export class RoomController {
   }
 
   @OnMessage("leave_game")
-  async eaveGame(@ConnectedSocket() socket: Socket) {
+  async eaveGame(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {
+    const { roomId, playerName, winCount, loseCount, drawCount } = body;
     const room = this.getRoom(socket);
     await socket.leave(room);
-    console.log(room, "@roomName");
-    console.log("leaving game");
     socket.to(room).emit("on_leave_game");
+
+    console.log(body, "@save result");
+
+    const afterSave = await GameResultModel.create({
+      roomId,
+      playerName,
+      winCount,
+      loseCount,
+      drawCount,
+    });
+
+    console.log(afterSave, "@after save");
   }
 
   @OnMessage("on_update_lists")
