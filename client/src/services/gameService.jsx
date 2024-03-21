@@ -26,4 +26,10 @@ export default {
   async onGameStart(socket, callback) {
     socket.on("start_game", callback);
   },
+  async gameWin(socket, message) {
+    socket.emit("game_win", { message });
+  },
+  async onGameWin(socket, callback) {
+    socket.on("game_win", ({ message }) => callback(message));
+  },
 };

@@ -5,6 +5,7 @@ import {
   SocketController,
 } from "socket-controllers";
 import { Socket } from "socket.io";
+import socket from "../config/socket";
 
 @SocketController()
 export class GameController {
@@ -23,7 +24,18 @@ export class GameController {
     @MessageBody() message: any
   ) {
     const gameRoom = this.getRoom(socket);
-    console.log(message.matrix, "@message");
     socket.to(gameRoom).emit("update_board_done", { matrix: message.matrix });
+  }
+
+  @OnMessage("game_win")
+  public async gameWinner(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() body: any
+  ) {
+    const { message } = body;
+    const gameRoom = this.getRoom(socket);
+    console.log(body, "@body");
+
+    socket.to(gameRoom).emit("game_win", { message });
   }
 }
