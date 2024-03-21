@@ -105,7 +105,7 @@
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true     ,
-    "outDir": "api"                            /* Skip type checking all .d.ts files. */
+    "outDir": "dist"                            /* Skip type checking all .d.ts files. */
   },
   "exclude": ["node_modules"]
 }
